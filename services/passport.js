@@ -24,21 +24,21 @@ passport.use(
     {
     clientID: keys.googleClientId,
     clientSecret: keys.googleClientSecret,
-    callbackURL: '/auth/google/callback'
+    callbackURL: '/auth/google/callback',
+    proxy: true
     },
 
     async (accessToken, refreshToken, profile, done) => {
       // instantiating a new user and calling a method .save
       const existingUser = await User.findOne({ googleID: profile.id })
       // existing user is a model instance that represents a user who is found
-      if (existingUser) {
-        done(null, existingUser);
-      } else {
-        // User and user are two seperate instances of the same user.
-        const user = await new User({ googleID: profile.id }).save()
-        done(null, user);
+        if (existingUser) {
+          return done(null, existingUser);
+        }
+          // User and user are two seperate instances of the same user.
+          const user = await new User({ googleID: profile.id }).save()
+          done(null, user);
             // saving a record to a database is an asynchronous operation
       }
-    })
   )
 );
